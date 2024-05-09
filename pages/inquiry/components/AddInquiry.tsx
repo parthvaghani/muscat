@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Button,
   Dialog,
@@ -8,18 +7,18 @@ import {
   DialogActions,
   DialogContentText,
   Typography,
-} from '@mui/material';
-import axiosPost from '@pages/axiosWrapper';
-import { API_URL } from '@pages/constant';
-import { useSelector } from '@src/store/Store';
+} from "@mui/material";
+import axiosPost from "@pages/axiosWrapper";
+import { API_URL } from "@src/utils/constant";
+import { useSelector } from "@src/store/Store";
 interface AddInquiryProps {
   onClose?: () => void;
 }
-const AddInquiry : React.FC<AddInquiryProps> = ({  onClose }) => {
+const AddInquiry: React.FC<AddInquiryProps> = ({ onClose }) => {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [password, setPassword] = useState(''); 
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [password, setPassword] = useState("");
   const [showPasswordInput, setShowPasswordInput] = useState(false);
   const handleClickOpen = () => {
     setOpen(true);
@@ -28,15 +27,14 @@ const AddInquiry : React.FC<AddInquiryProps> = ({  onClose }) => {
   const handleClose = () => {
     setOpen(false);
     setShowPasswordInput(false);
-   
   };
   const handleSetPasswordClick = () => {
     setShowPasswordInput(true); // 비밀번호 입력 필드 표시
   };
   // const author: string | undefined = useSelector((state) => state.auth.user?.email);
   const handleSubmit = async () => {
-    const str = sessionStorage.getItem('user')
-    const author = JSON.parse(str).name
+    const str = sessionStorage.getItem("user");
+    const author = JSON.parse(str).name;
     const inquiryData = {
       title,
       content,
@@ -44,35 +42,44 @@ const AddInquiry : React.FC<AddInquiryProps> = ({  onClose }) => {
       author,
       created_date: new Date().toDateString(),
     };
- 
+
     try {
-      const response = await axiosPost(`${API_URL}/inquiry/Register`, inquiryData);
+      const response = await axiosPost(
+        `${API_URL}/inquiry/Register`,
+        inquiryData
+      );
 
       if (response.status === 200) {
         // Handle successful response
-        console.log('Inquiry submitted successfully:', response.data); 
+        console.log("Inquiry submitted successfully:", response.data);
         // Reset form and close dialog
         setOpen(false);
-        setTitle('');
-        setContent('');
-        setPassword(''); 
+        setTitle("");
+        setContent("");
+        setPassword("");
         if (onClose) onClose();
       } else {
         // Handle non-200 responses
-        console.error('Failed to submit the inquiry:', response.data);
+        console.error("Failed to submit the inquiry:", response.data);
       }
-    } catch (error:any) {
-      console.error('Error submitting the inquiry:', error.message);
+    } catch (error: any) {
+      console.error("Error submitting the inquiry:", error.message);
     }
   };
-  const handleContentChange = (e : any) => { 
+  const handleContentChange = (e: any) => {
     console.log(e.target.value);
     setContent(e.target.value);
   };
 
   return (
     <>
-      <Button onClick={handleClickOpen} disableElevation color="primary" variant="contained" sx={{ width: 150 }}>
+      <Button
+        onClick={handleClickOpen}
+        disableElevation
+        color="primary"
+        variant="contained"
+        sx={{ width: 150 }}
+      >
         문의 추가
       </Button>
 
@@ -121,17 +128,23 @@ const AddInquiry : React.FC<AddInquiryProps> = ({  onClose }) => {
               variant="outlined"
             />
           ) : (
-            <Button onClick={handleSetPasswordClick} color="secondary" variant="outlined" sx={{ my: 2 }}>
+            <Button
+              onClick={handleSetPasswordClick}
+              color="secondary"
+              variant="outlined"
+              sx={{ my: 2 }}
+            >
               비밀번호 설정
             </Button>
-          )} 
-           
+          )}
         </DialogContent>
         <DialogActions>
-          <Button color='error' onClick={handleClose}>취소</Button>
+          <Button color="error" onClick={handleClose}>
+            취소
+          </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!title || !content }
+            disabled={!title || !content}
             variant="contained"
           >
             저장

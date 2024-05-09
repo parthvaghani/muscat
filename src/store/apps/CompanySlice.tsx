@@ -1,9 +1,8 @@
-import axiosPost,{axiosDelete} from '@pages/axiosWrapper';
+import axiosPost, { axiosDelete } from "@pages/axiosWrapper";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { CompanyType } from '../../types/apps/company'; 
-import { API_URL } from '@pages/constant';
-import { dispatch } from '../Store';
- 
+import { CompanyType } from "../../types/apps/company";
+import { API_URL } from "@src/utils/constant";
+import { dispatch } from "../Store";
 
 interface StateType {
   companies: CompanyType[];
@@ -21,8 +20,14 @@ export const registerCompany = createAsyncThunk(
   "company/Register",
   async (companyData: any, { rejectWithValue }) => {
     try {
-      const response = await axiosPost(`${API_URL}/company/Register`, companyData);
-      return { ...response.data, companyData: { ...companyData,id:response.data.id }  }; 
+      const response = await axiosPost(
+        `${API_URL}/company/Register`,
+        companyData
+      );
+      return {
+        ...response.data,
+        companyData: { ...companyData, id: response.data.id },
+      };
     } catch (error: any) {
       return rejectWithValue(error.response?.data);
     }
@@ -30,29 +35,26 @@ export const registerCompany = createAsyncThunk(
 );
 
 export const deleteCompanies = createAsyncThunk(
-  'companies/deleteMultiple',
+  "companies/deleteMultiple",
   async (companyIds: string, { rejectWithValue }) => {
     try {
       const response = await axiosDelete(`${API_URL}/company/Delete`, {
-        data: { str_ids: companyIds }
+        data: { str_ids: companyIds },
       });
-      
-      
-     return { ...response.data, deletedCompanyIds: companyIds};
+
+      return { ...response.data, deletedCompanyIds: companyIds };
     } catch (error: any) {
       return rejectWithValue(error.response?.data);
     }
   }
 );
 
- 
-
 export const fetchCompanies = createAsyncThunk(
   "company/List",
   async (_, { rejectWithValue }) => {
     try {
       console.log(`${API_URL}/company/List`);
-      const response = await axiosPost(`${API_URL}/company/List`,{});
+      const response = await axiosPost(`${API_URL}/company/List`, {});
       return response.data;
     } catch (error: any) {
       console.log(error);
@@ -67,21 +69,21 @@ export const CompanySlice = createSlice({
   reducers: {
     setSearchQuery(state, action) {
       state.searchQuery = action.payload;
-    }, 
+    },
   },
   extraReducers: (builder) => {
-    builder 
+    builder
       .addCase(registerCompany.fulfilled, (state, action) => {
-        const companyData = action.payload.companyData; 
-        console.log("companyData:",companyData);
+        const companyData = action.payload.companyData;
+        console.log("companyData:", companyData);
         state.companies.push(companyData);
       })
       .addCase(deleteCompanies.fulfilled, (state, action) => {
         if (action.payload.result === "SUCCESS") {
-          // 삭제된 회사 ID들을 반환하는 것으로 가정 
+          // 삭제된 회사 ID들을 반환하는 것으로 가정
           const deletedCompanyIds = action.payload.deletedCompanyIds;
           state.companies = state.companies.filter(
-            company => !deletedCompanyIds.includes(company.id)
+            (company) => !deletedCompanyIds.includes(company.id)
           );
         } else {
           // 삭제에 실패한 경우 처리
@@ -92,7 +94,7 @@ export const CompanySlice = createSlice({
         state.companies = action.payload;
       })
       .addMatcher(
-        action => action.type.endsWith("/rejected"),
+        (action) => action.type.endsWith("/rejected"),
         (state, action) => {
           state.error = action.payload as string;
         }
@@ -100,9 +102,6 @@ export const CompanySlice = createSlice({
   },
 });
 
-export const {  
-  setSearchQuery, 
-} = CompanySlice.actions;
- 
+export const { setSearchQuery } = CompanySlice.actions;
 
 export default CompanySlice.reducer;

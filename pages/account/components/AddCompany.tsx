@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -7,19 +7,18 @@ import {
   DialogActions,
   DialogContentText,
   Typography,
-} from '@mui/material';
-import axiosPost from '@pages/axiosWrapper';
-import { API_URL } from '@pages/constant';
+} from "@mui/material";
+import axiosPost from "@pages/axiosWrapper";
+import { API_URL } from "@src/utils/constant";
 interface AddCompaniesProps {
   onClose?: () => void;
 }
- 
-const AddCompany : React.FC<AddCompaniesProps> = ({  onClose }) => {
 
+const AddCompany: React.FC<AddCompaniesProps> = ({ onClose }) => {
   const [open, setOpen] = useState(false);
-  const [registerNum, setRegisterNum] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [errorTitle, setErrorTitle] = useState('');
+  const [registerNum, setRegisterNum] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [errorTitle, setErrorTitle] = useState("");
   const dialogContentRef = useRef<HTMLDivElement>(null);
 
   const handleClickOpen = () => {
@@ -29,7 +28,7 @@ const AddCompany : React.FC<AddCompaniesProps> = ({  onClose }) => {
   const handleClose = () => {
     setOpen(false);
   };
- 
+
   const handleDialogVibrate = () => {
     if (navigator.vibrate) {
       navigator.vibrate(200); // 200ms 동안 진동
@@ -49,15 +48,24 @@ const AddCompany : React.FC<AddCompaniesProps> = ({  onClose }) => {
 
   return (
     <>
-      <Button onClick={handleClickOpen} disableElevation color="primary" variant="contained" sx={{width:150}}>업체 등록</Button>
-       
+      <Button
+        onClick={handleClickOpen}
+        disableElevation
+        color="primary"
+        variant="contained"
+        sx={{ width: 150 }}
+      >
+        업체 등록
+      </Button>
+
       <Dialog open={open} onClose={handleClose}>
         <DialogContent ref={dialogContentRef}>
           <Typography variant="h5" mb={2} fontWeight={700}>
             새로운 회사 등록
           </Typography>
           <DialogContentText>
-            새로운 회사를 등록하기 위해 등록 번호와 회사 이름을 입력한 후, 제출 버튼을 눌러주세요.
+            새로운 회사를 등록하기 위해 등록 번호와 회사 이름을 입력한 후, 제출
+            버튼을 눌러주세요.
           </DialogContentText>
           <TextField
             value={registerNum}
@@ -70,7 +78,10 @@ const AddCompany : React.FC<AddCompaniesProps> = ({  onClose }) => {
             size="small"
             variant="outlined"
             error={!isValidRegisterNum(registerNum)}
-            helperText={!isValidRegisterNum(registerNum) && '유효한 사업자 등록 번호를 입력하세요 (000-00-00000)'}
+            helperText={
+              !isValidRegisterNum(registerNum) &&
+              "유효한 사업자 등록 번호를 입력하세요 (000-00-00000)"
+            }
           />
           <TextField
             value={companyName}
@@ -83,29 +94,33 @@ const AddCompany : React.FC<AddCompaniesProps> = ({  onClose }) => {
             size="small"
             variant="outlined"
           />
-           <Typography color={'red'}> {errorTitle}  </Typography> 
+          <Typography color={"red"}> {errorTitle} </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>취소</Button>
           <Button
-            disabled={!registerNum || !companyName || !isValidRegisterNum(registerNum)}
-            onClick={ async () => { 
+            disabled={
+              !registerNum || !companyName || !isValidRegisterNum(registerNum)
+            }
+            onClick={async () => {
               try {
-                const response = await axiosPost(`${API_URL}/company/Register`, { register_num: registerNum, company_name: companyName });
-                if (response.data.result === 'success') {
+                const response = await axiosPost(
+                  `${API_URL}/company/Register`,
+                  { register_num: registerNum, company_name: companyName }
+                );
+                if (response.data.result === "success") {
                   setOpen(false);
-                  setRegisterNum('');
-                  setCompanyName('');
+                  setRegisterNum("");
+                  setCompanyName("");
                   onClose();
-                } else if (response.data.result === 'fail') {
+                } else if (response.data.result === "fail") {
                   setErrorTitle(response.data.error_message);
                   handleDialogVibrate();
                   setTimeout(() => {
-                    setErrorTitle('');
+                    setErrorTitle("");
                   }, 3000);
                 }
-              } catch (error) {
-              }
+              } catch (error) {}
             }}
             variant="contained"
           >
@@ -113,7 +128,6 @@ const AddCompany : React.FC<AddCompaniesProps> = ({  onClose }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      
     </>
   );
 };

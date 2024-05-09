@@ -1,6 +1,6 @@
 // src/components/DeleteCompanies.tsx
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   Button,
   Dialog,
@@ -8,20 +8,23 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-} from '@mui/material';  
-import axiosPost,{axiosDelete} from '@pages/axiosWrapper';
-import { API_URL } from '@pages/constant';
+} from "@mui/material";
+import axiosPost, { axiosDelete } from "@pages/axiosWrapper";
+import { API_URL } from "@src/utils/constant";
 
 interface DeleteInquiryProps {
   selectedInquiryIds: string;
   onClose?: () => void;
 }
 
-const DeleteInquiry: React.FC<DeleteInquiryProps> = ({ selectedInquiryIds, onClose }) => {  
-  const [open, setOpen] = useState<boolean>(false); 
+const DeleteInquiry: React.FC<DeleteInquiryProps> = ({
+  selectedInquiryIds,
+  onClose,
+}) => {
+  const [open, setOpen] = useState<boolean>(false);
   const handleClickOpen = (): void => {
     setOpen(true);
-  }; 
+  };
   const handleClose = (): void => {
     setOpen(false);
     if (onClose) onClose();
@@ -29,18 +32,18 @@ const DeleteInquiry: React.FC<DeleteInquiryProps> = ({ selectedInquiryIds, onClo
 
   const handleDelete = async (): Promise<void> => {
     if (selectedInquiryIds.length > 0) {
-      try { 
+      try {
         const deleteResponse = await axiosDelete(`${API_URL}/inquiry/Delete`, {
-          data: { str_ids: selectedInquiryIds }
+          data: { str_ids: selectedInquiryIds },
         });
-  
+
         if (deleteResponse.status === 200) {
           // Handle successful delete response (status code 200)
           const { result } = deleteResponse.data;
           if (result === "SUCCESS") {
             handleClose();
             // Fetch updated list after successful deletion
-            const listResponse = await axiosPost(`${API_URL}/inquiry/List`,{});
+            const listResponse = await axiosPost(`${API_URL}/inquiry/List`, {});
 
             // Handle the list response as needed
             console.log("List of companies:", listResponse.data);
@@ -52,17 +55,22 @@ const DeleteInquiry: React.FC<DeleteInquiryProps> = ({ selectedInquiryIds, onClo
           // Handle failed delete response (status code 400)
           console.error("API request failed:", deleteResponse.data);
         }
-      } catch (error:any) {
+      } catch (error: any) {
         // Handle any other errors (e.g., network issues, invalid URL, etc.)
         console.error("Error fetching data from API:", error.message);
       }
     }
   };
-  
 
   return (
     <>
-      <Button variant="contained" color="error"  sx={{width:150, mr:1}} onClick={handleClickOpen} disabled={selectedInquiryIds.length === 0}>
+      <Button
+        variant="contained"
+        color="error"
+        sx={{ width: 150, mr: 1 }}
+        onClick={handleClickOpen}
+        disabled={selectedInquiryIds.length === 0}
+      >
         문의 삭제
       </Button>
       <Dialog open={open} onClose={handleClose}>
@@ -74,7 +82,9 @@ const DeleteInquiry: React.FC<DeleteInquiryProps> = ({ selectedInquiryIds, onClo
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>취소</Button>
-          <Button onClick={handleDelete} color="error">삭제</Button>
+          <Button onClick={handleDelete} color="error">
+            삭제
+          </Button>
         </DialogActions>
       </Dialog>
     </>
