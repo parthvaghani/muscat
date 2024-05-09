@@ -1,9 +1,8 @@
-import axiosPost, {axiosDelete} from '@pages/axiosWrapper';
+import axiosPost, { axiosDelete } from "@pages/axiosWrapper";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ProjectType } from '../../types/apps/project'; // Assuming ProjectType is defined elsewhere
-import { API_URL } from '@pages/constant';
-import { dispatch } from '../Store';
- 
+import { ProjectType } from "../../types/apps/project"; // Assuming ProjectType is defined elsewhere
+import { API_URL } from "@src/utils/constant";
+import { dispatch } from "../Store";
 
 interface StateType {
   projects: ProjectType[]; // Assuming ProjectType is defined elsewhere
@@ -21,8 +20,14 @@ export const registerProject = createAsyncThunk(
   "project/Register",
   async (projectData: any, { rejectWithValue }) => {
     try {
-      const response = await axiosPost(`${API_URL}/project/Register`, projectData);
-      return { ...response.data, projectData: { ...projectData, id: response.data.id } };
+      const response = await axiosPost(
+        `${API_URL}/project/Register`,
+        projectData
+      );
+      return {
+        ...response.data,
+        projectData: { ...projectData, id: response.data.id },
+      };
     } catch (error: any) {
       return rejectWithValue(error.response?.data);
     }
@@ -30,13 +35,13 @@ export const registerProject = createAsyncThunk(
 );
 
 export const deleteProjects = createAsyncThunk(
-  'projects/deleteMultiple',
+  "projects/deleteMultiple",
   async (projectIds: string, { rejectWithValue }) => {
     try {
       const response = await axiosDelete(`${API_URL}/project/Delete`, {
-        data: { str_ids: projectIds }
-      }); 
-      return { ...response.data, deletedProjectIds: projectIds};
+        data: { str_ids: projectIds },
+      });
+      return { ...response.data, deletedProjectIds: projectIds };
     } catch (error: any) {
       return rejectWithValue(error.response?.data);
     }
@@ -47,7 +52,7 @@ export const fetchProjects = createAsyncThunk(
   "project/List",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosPost(`${API_URL}/project/List`,{});
+      const response = await axiosPost(`${API_URL}/project/List`, {});
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data);
@@ -61,19 +66,19 @@ export const ProjectSlice = createSlice({
   reducers: {
     setSearchQuery(state, action) {
       state.searchQuery = action.payload;
-    }, 
+    },
   },
   extraReducers: (builder) => {
-    builder 
+    builder
       .addCase(registerProject.fulfilled, (state, action) => {
-        const projectData = action.payload.projectData; 
+        const projectData = action.payload.projectData;
         state.projects.push(projectData);
       })
       .addCase(deleteProjects.fulfilled, (state, action) => {
         if (action.payload.result === "SUCCESS") {
           const deletedProjectIds = action.payload.deletedProjectIds;
           state.projects = state.projects.filter(
-            project => !deletedProjectIds.includes(project.id)
+            (project) => !deletedProjectIds.includes(project.id)
           );
         } else {
           // Handle deletion failure
@@ -83,7 +88,7 @@ export const ProjectSlice = createSlice({
         state.projects = action.payload;
       })
       .addMatcher(
-        action => action.type.endsWith("/rejected"),
+        (action) => action.type.endsWith("/rejected"),
         (state, action) => {
           state.error = action.payload as string;
         }
@@ -91,8 +96,4 @@ export const ProjectSlice = createSlice({
   },
 });
 
-export const {  
-  setSearchQuery, 
-} = ProjectSlice.actions;
-  
-
+export const { setSearchQuery } = ProjectSlice.actions;

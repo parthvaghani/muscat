@@ -1,5 +1,10 @@
-import { useState, useEffect } from 'react';
-import { TableContainer, Table, TableRow,TableCell,TableBody,
+import { useState, useEffect } from "react";
+import {
+  TableContainer,
+  Table,
+  TableRow,
+  TableCell,
+  TableBody,
   Typography,
   TableHead,
   Box,
@@ -11,21 +16,20 @@ import { TableContainer, Table, TableRow,TableCell,TableBody,
   MenuItem,
   IconButton,
   Chip,
-} from '@mui/material';
-import PageContainer from '@src/components/container/PageContainer';
-import Breadcrumb from '@src/layouts/full/shared/breadcrumb/Breadcrumb';
-import DashboardCard from '@src/components/shared/DashboardCard';
+} from "@mui/material";
+import PageContainer from "@src/components/container/PageContainer";
+import Breadcrumb from "@src/layouts/full/shared/breadcrumb/Breadcrumb";
+import DashboardCard from "@src/components/shared/DashboardCard";
 import dynamic from "next/dynamic";
-import CustomSelect from '@src/components/forms/theme-elements/CustomSelect';
-import Link from 'next/link';
-import { AppDispatch, useDispatch } from '@src/store/Store';
-import { fetchNotices } from '@src/store/apps/NoticeSlice';
-import { Row } from 'antd';
-import { useRouter } from 'next/router';
-const axios = require('axios');
-import { API_URL } from '@pages/constant';
-import axiosPost from '@pages/axiosWrapper';
-
+import CustomSelect from "@src/components/forms/theme-elements/CustomSelect";
+import Link from "next/link";
+import { AppDispatch, useDispatch } from "@src/store/Store";
+import { fetchNotices } from "@src/store/apps/NoticeSlice";
+import { Row } from "antd";
+import { useRouter } from "next/router";
+const axios = require("axios");
+import { API_URL } from "@src/utils/constant";
+import axiosPost from "@pages/axiosWrapper";
 
 interface SelectedFile {
   file: File;
@@ -43,39 +47,39 @@ const ReactQuill: any = dynamic(
 );
 const BCrumb = [
   {
-    to: '/noticelist',
-    title: '공지사항',
+    to: "/noticelist",
+    title: "공지사항",
   },
   {
-    title: '글작성',
+    title: "글작성",
   },
 ];
 
 export default function QuillEditor() {
   const router = useRouter();
-  
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const [category, setCategory] = useState(0);
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
 
   const theme = useTheme();
   const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
-  const dispatch: AppDispatch = useDispatch(); 
-  const [projects, setProjects] = useState([])
+  const dispatch: AppDispatch = useDispatch();
+  const [projects, setProjects] = useState([]);
 
-  const fetchData = async() => {
-    const response = await axiosPost(`${API_URL}/project/List`,{});
-    console.log(response.data)
-    setProjects(response.data)
-  }
+  const fetchData = async () => {
+    const response = await axiosPost(`${API_URL}/project/List`, {});
+    console.log(response.data);
+    setProjects(response.data);
+  };
 
   useEffect(() => {
     // 프로젝트 목록 가져오기
     fetchData();
-    
-    const str = sessionStorage.getItem('user')
-    setName(JSON.parse(str).name)
+
+    const str = sessionStorage.getItem("user");
+    setName(JSON.parse(str).name);
   }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,35 +96,33 @@ export default function QuillEditor() {
     setSelectedFile(null);
   };
 
-   
   const handleSave = () => {
     const formData = new FormData();
-    if (selectedFile) 
-      formData.append('file', selectedFile.file);
-    else formData.append('file', '');
-    formData.append('project_id', category.toString());
-    formData.append('title', title);
-    formData.append('content', content);
-    formData.append('create_by', name);
-  
+    if (selectedFile) formData.append("file", selectedFile.file);
+    else formData.append("file", "");
+    formData.append("project_id", category.toString());
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("create_by", name);
+
     fetch(`${API_URL}/notice/Register`, {
-      method: 'POST',
-      body: formData
+      method: "POST",
+      body: formData,
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
         return response.json();
       })
       .then(() => {
         dispatch(fetchNotices());
-        setContent('');
-        setTitle('');
+        setContent("");
+        setTitle("");
         setSelectedFile(null);
         router.back();
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Failed to register the notice:", error);
       });
   };
@@ -139,21 +141,35 @@ export default function QuillEditor() {
         }
       >
         <>
-          <Card sx={{ p: 0, border: 1, borderColor: 'black' }} variant={'outlined'}>
-            <TableContainer sx={{ borderColor: 'black' }}>
+          <Card
+            sx={{ p: 0, border: 1, borderColor: "black" }}
+            variant={"outlined"}
+          >
+            <TableContainer sx={{ borderColor: "black" }}>
               <Table
                 aria-label="simple table"
                 sx={{
-                  whiteSpace: 'nowrap',
-                  borderColor: 'black'
+                  whiteSpace: "nowrap",
+                  borderColor: "black",
                 }}
               >
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ backgroundColor: "primary.light", borderColor: 'black' }}>
-                      <Typography color={'dark'} variant="h6">제목</Typography>
+                    <TableCell
+                      sx={{
+                        backgroundColor: "primary.light",
+                        borderColor: "black",
+                      }}
+                    >
+                      <Typography color={"dark"} variant="h6">
+                        제목
+                      </Typography>
                     </TableCell>
-                    <TableCell width={'100%'} sx={{ borderColor: 'black' }} colSpan={7}>
+                    <TableCell
+                      width={"100%"}
+                      sx={{ borderColor: "black" }}
+                      colSpan={7}
+                    >
                       <Input
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
@@ -162,10 +178,15 @@ export default function QuillEditor() {
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ backgroundColor: "primary.light", borderColor: 'black' }}>
+                    <TableCell
+                      sx={{
+                        backgroundColor: "primary.light",
+                        borderColor: "black",
+                      }}
+                    >
                       <Typography variant="h6">분류</Typography>
                     </TableCell>
-                    <TableCell sx={{ borderColor: 'black' }}>
+                    <TableCell sx={{ borderColor: "black" }}>
                       <CustomSelect
                         labelId="project-select-label"
                         id="project-select"
@@ -173,10 +194,8 @@ export default function QuillEditor() {
                         value={category}
                         sx={{ width: 200, mr: 1 }}
                         onChange={(e: any) => setCategory(e.target.value)}
-                      > 
-                        <MenuItem value={0}>
-                          전체
-                        </MenuItem>
+                      >
+                        <MenuItem value={0}>전체</MenuItem>
                         {projects.map((project: any) => (
                           <MenuItem key={project.id} value={project.id}>
                             {project.name}
@@ -186,30 +205,45 @@ export default function QuillEditor() {
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ backgroundColor: "primary.light", borderColor: 'black' }}>
-                      <Typography color={'dark'} variant="h6">첨부파일</Typography>
+                    <TableCell
+                      sx={{
+                        backgroundColor: "primary.light",
+                        borderColor: "black",
+                      }}
+                    >
+                      <Typography color={"dark"} variant="h6">
+                        첨부파일
+                      </Typography>
                     </TableCell>
                     <TableCell>
-                      <Row align={'middle'}>
-                      <InputLabel  htmlFor="file-upload" style={{ textAlign:'center', width:80, borderBottom: '1px solid black' }} component="label">
-                        파일 선택
-                      </InputLabel>
-                      <Input
-                        id="file-upload"
-                        type="file"
-                        onChange={handleFileChange}
-                        inputProps={{
-                          'aria-label': '첨부파일',
-                        }}
-                        style={{ display: 'none' }}
-                      />
-                      {selectedFile && (
-                        <Chip
-                          style={{ marginLeft: 2 }}
-                          label={selectedFile.file.name}
-                          onDelete={handleDelete}
+                      <Row align={"middle"}>
+                        <InputLabel
+                          htmlFor="file-upload"
+                          style={{
+                            textAlign: "center",
+                            width: 80,
+                            borderBottom: "1px solid black",
+                          }}
+                          component="label"
+                        >
+                          파일 선택
+                        </InputLabel>
+                        <Input
+                          id="file-upload"
+                          type="file"
+                          onChange={handleFileChange}
+                          inputProps={{
+                            "aria-label": "첨부파일",
+                          }}
+                          style={{ display: "none" }}
                         />
-                      )}
+                        {selectedFile && (
+                          <Chip
+                            style={{ marginLeft: 2 }}
+                            label={selectedFile.file.name}
+                            onDelete={handleDelete}
+                          />
+                        )}
                       </Row>
                     </TableCell>
                   </TableRow>
@@ -217,34 +251,49 @@ export default function QuillEditor() {
                 <TableBody>
                   <TableRow>
                     <TableCell colSpan={2}>
-                        <ReactQuill
-                          value={content}
-                          onChange={setContent}
-                          modules={{
-                            toolbar: [
-                              [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
-                              [{size: []}],
-                              ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                              [{'list': 'ordered'}, {'list': 'bullet'}, 
-                              {'indent': '-1'}, {'indent': '+1'}],
-                              ['link', 'image'],
-                              ['clean']
+                      <ReactQuill
+                        value={content}
+                        onChange={setContent}
+                        modules={{
+                          toolbar: [
+                            [{ header: "1" }, { header: "2" }, { font: [] }],
+                            [{ size: [] }],
+                            [
+                              "bold",
+                              "italic",
+                              "underline",
+                              "strike",
+                              "blockquote",
                             ],
-                            clipboard: { 
-                              matchVisual: false,
-                            }
-                          }}
-                          placeholder="Type here..."
-                        /> 
-                       
+                            [
+                              { list: "ordered" },
+                              { list: "bullet" },
+                              { indent: "-1" },
+                              { indent: "+1" },
+                            ],
+                            ["link", "image"],
+                            ["clean"],
+                          ],
+                          clipboard: {
+                            matchVisual: false,
+                          },
+                        }}
+                        placeholder="Type here..."
+                      />
                     </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
             </TableContainer>
           </Card>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginY: 2 }}>
-            <Button component={Link} href="/noticelist" variant="contained" onClick={() => { }} sx={{ mr: 1 }}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", marginY: 2 }}>
+            <Button
+              component={Link}
+              href="/noticelist"
+              variant="contained"
+              onClick={() => {}}
+              sx={{ mr: 1 }}
+            >
               목록
             </Button>
           </Box>
@@ -252,4 +301,4 @@ export default function QuillEditor() {
       </DashboardCard>
     </PageContainer>
   );
-};
+}
