@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText,  DialogTitle, Divider, InputLabel, Table, TableBody, TableCell, TableRow, TextField, Typography, Input, MenuItem } from '@mui/material';
 import { useRouter } from 'next/router'; // Import useRouter from Next.js
 import { API_URL } from '@pages/constant';
-import axiosPost from '@pages/axiosWrapper'; 
+import axiosPost from '@pages/axiosWrapper';
 import { UserType } from '@src/types/apps/account';
 import { AppDispatch, useDispatch } from '@src/store/Store';
 import { updateUser } from '@src/store/apps/UserSlice';
-import CustomSelect from '@src/components/forms/theme-elements/CustomSelect'; 
-import { API_URL } from '@pages/constant'; 
+import CustomSelect from '@src/components/forms/theme-elements/CustomSelect';
 
 export default function AccountDetailTable() {
   const [editMode, setEditMode] = useState(false); // State to track edit mode
@@ -19,7 +18,7 @@ export default function AccountDetailTable() {
   const [userInfo, setUserInfo] = useState<UserType>( {
     user_id: null,
     user_type: 0,
-    user_email: "", 
+    user_email: "",
     user_password: "",
     register_num: "",
     company_address: "",
@@ -57,7 +56,7 @@ export default function AccountDetailTable() {
         // Handle error if necessary
       }
     };
-    
+
     fetchDetail();
   }, []); // 페이지 로드시 한번만 실행
 
@@ -72,7 +71,7 @@ export default function AccountDetailTable() {
   const handleSaveChanges = async() => {
     // Check if passwords match
 
-    if (newPassword === confirmPassword) { 
+    if (newPassword === confirmPassword) {
       // 비밀번호가 일치하면 사용자 정보를 업데이트합니다.
       let updateInfo:UserType = userInfo
       if (newPassword !== '') {
@@ -113,7 +112,7 @@ export default function AccountDetailTable() {
           </Typography>
             <Table>
           <TableBody>
-            
+
             <TableRow sx={{ padding: 1, border: '1px solid black' }}>
               <TableCell sx={{ backgroundColor: '#f0f0f0', width: '30%', border: '1px solid black' }}>
                 <InputLabel htmlFor="id" sx={{ fontWeight: 'bold' }}>
@@ -159,8 +158,8 @@ export default function AccountDetailTable() {
                   비밀번호
                 </InputLabel>
               </TableCell>
-              <TableCell sx={{ padding: 0, border: '1px solid black' }}> 
-                  <Input readOnly disableUnderline value={userInfo.user_email} type="password" sx={{ px:2}}></Input> 
+              <TableCell sx={{ padding: 0, border: '1px solid black' }}>
+                  <Input readOnly disableUnderline value={userInfo.user_email} type="password" sx={{ px:2}}></Input>
               </TableCell>
             </TableRow>
             )
@@ -300,7 +299,7 @@ export default function AccountDetailTable() {
               </TableCell>
               <TableCell sx={{ padding: 1, border: '1px solid black' }}>
                   <Typography sx={{ml:1}}>{userInfo.company_name}</Typography>
-                
+
               </TableCell>
             </TableRow>
 
@@ -409,7 +408,7 @@ export default function AccountDetailTable() {
                 {editMode ? (
                   <TextField
                   fullWidth
-                  
+
                     type="text"
                     value={userInfo.manager_grade}
                     onChange={(e) => setUserInfo({ ...userInfo, manager_grade: e.target.value })}
@@ -421,7 +420,7 @@ export default function AccountDetailTable() {
             </TableRow>
           </TableBody>
         </Table>
-        
+
           )}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginY: 2 }}>
             {editMode ? (
@@ -438,10 +437,10 @@ export default function AccountDetailTable() {
         </>) : (
           <></>
         )}
-        
+
       </Box>
-      
-      
+
+
       {/* // Success Dialog */}
       <Dialog open={showSuccessPopup} onClose={handleClosePopup}>
         <DialogTitle></DialogTitle>
@@ -451,15 +450,15 @@ export default function AccountDetailTable() {
         <DialogActions>
           <Button onClick={() => { handleClosePopup(); /*router.push('/account/account-manager');*/ }}>OK</Button>
         </DialogActions>
-      </Dialog> 
-       <Dialog open={showErrorPopup} onClose={handleClosePopup}> 
+      </Dialog>
+       <Dialog open={showErrorPopup} onClose={handleClosePopup}>
         <DialogContent sx={{width:200}} >
           <DialogContentText>입력한 비밀번호가 일치하지 않습니다.</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClosePopup}>OK</Button>
         </DialogActions>
-      </Dialog> 
+      </Dialog>
       <Dialog open={showModal} onClose={onClose}>
         <DialogTitle></DialogTitle>
         <DialogContent sx={{width:300}} >
@@ -468,7 +467,7 @@ export default function AccountDetailTable() {
         <DialogActions>
           <Button onClick={() => { onClose(); }}>OK</Button>
         </DialogActions>
-      </Dialog> 
+      </Dialog>
     </Box>
   );
 }
