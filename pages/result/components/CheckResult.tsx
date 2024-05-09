@@ -11,11 +11,10 @@ import DetailOn from "public/images/img/detail_on.png";
 import DetailOff from "public/images/img/detail_off.png";
 import LockOn from "public/images/img/lock_on.png";
 import LockOff from "public/images/img/lock_off.png";
-import { API_URL } from '@pages/constant';
 import { Send } from '@mui/icons-material';
- 
-const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: string,  userType: number , consigneeData : any;}) => { 
-  const [checkAll, setCheckAll] = React.useState('Y'); 
+
+const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: string,  userType: number , consigneeData : any;}) => {
+  const [checkAll, setCheckAll] = React.useState('Y');
   const [checkExcept, setCheckExcept] = React.useState(false);
   const [exceptType, setExceptType] = React.useState(0);
   const [exceptReason, setExceptReason] = React.useState('');
@@ -26,7 +25,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
   const [attachment, setAttachment] = useState('');
   const [project_attachment, setProjectAttachment] = useState('');
   const [request_content, setRequestContent] = useState('');
-  
+
   const exceptList = [{
     id: 1,
     name: 'PG사',
@@ -62,11 +61,11 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
       if (data.result == 'FAIL') {
         setModalMsg(data.reason);
         setShowModal(true)
-        
+
       }
       else if (data.result == 'SUCCESS') {
         setModalMsg('정확히 업로드되었습니다.');
-        setShowModal(true) 
+        setShowModal(true)
         setAttachment(selectedFile.name);
         let newData: any[] = [];
         checkDataArray.map((x) => {
@@ -74,8 +73,8 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
             x.attachment = selectedFile.name  ;
           }
           newData.push(x)
-        }) 
-        setCheckDataArray(newData) 
+        })
+        setCheckDataArray(newData)
       }
     })
     .catch(error => {
@@ -83,8 +82,8 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
     });
   };
 
-  const handleFileChange2 = async(e:any) => { 
-    const selectedFile = e.target.files[0]; 
+  const handleFileChange2 = async(e:any) => {
+    const selectedFile = e.target.files[0];
     // 파일 선택이 완료된 후 추가 작업 수행
     const formData = new FormData();
     formData.append('file', e.target.files[0]);
@@ -97,12 +96,12 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
     .then(data => {
       if (data.result == 'FAIL') {
         setModalMsg(data.reason);
-        setShowModal(true) 
+        setShowModal(true)
       }
       else if (data.result == 'SUCCESS') {
         setModalMsg('정확히 업로드되었습니다.');
-        setShowModal(true) 
-        setProjectAttachment(selectedFile.name); 
+        setShowModal(true)
+        setProjectAttachment(selectedFile.name);
       }
     })
     .catch(error => {
@@ -121,8 +120,8 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
       additional: checkAll,
       result: checkAll,
     }));
-    setCheckDataArray(updatedCheckDataArray);    
-    
+    setCheckDataArray(updatedCheckDataArray);
+
   }
   const onClose = () => {
     setShowModal(false)
@@ -153,7 +152,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
       [name]:true
     }));
   };
-  
+
 
   // 체크박스 데이터 배열
   const checkboxesData = [
@@ -164,85 +163,85 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
   ];
 
   const [newMemo, setNewMemo] = React.useState('');
- 
-  const sendMemo = async () => { 
-    try { 
-      
+
+  const sendMemo = async () => {
+    try {
+
       const checkedLabels = Object.keys(checkboxes)
       .filter(key => checkboxes[key]) // true로 설정된 항목만 필터링
       .map(key => checkboxesData.find(item => item.name === key)?.label); // 해당 항목의 label을 매핑
-     
-      const response = await axiosPost(`${API_URL}/memos/Register`, { 
+
+      const response = await axiosPost(`${API_URL}/memos/Register`, {
         reason: checkedLabels[0],
         consignor_name: consignor,
         consignee_name: consigneeData.company_name,
         date: '',
       });
-      const response1 = await axiosPost(`${API_URL}/memo_details/Register`, { 
+      const response1 = await axiosPost(`${API_URL}/memo_details/Register`, {
         memo_id: response.data.id,
         author: consigneeData.checker_name,
         text: newMemo
       });
       var response_issue = await axiosPost(`${API_URL}/project_detail/Update`, {
-        id: consigneeData.id, 
+        id: consigneeData.id,
         issue_id: response.data.id  ,
         issue_type: Object.keys(checkboxes).filter(key => checkboxes[key])[0],
         issue_date : new Date().toDateString()
-      }); 
-      if (response_issue.data.result === 'success') { 
+      });
+      if (response_issue.data.result === 'success') {
         setNewMemo('');
         setDetailsDialogOpen(false);
-      }  
+      }
     } catch (error) {
       // 오류 처리
-    } 
+    }
   }
-  
+
 
   const fetchChecklist = async( ) => {
     let response = await axiosPost(`${API_URL}/checkinfo/ListByProject`, {
       project_id: consigneeData.project_id
-    }); 
+    });
      setChecklistData(response.data);
   }
   React.useEffect(() => {
     console.log(consigneeData)
     if (consigneeData.project_id)
-      fetchChecklist(); 
+      fetchChecklist();
   }, [consigneeData]);
 
-  React.useEffect(() => {     
+  React.useEffect(() => {
     if(userType == 1 && consigneeData.state == 1 && consigneeData.sub_state == 1){ //- 자가점검 중 :: 수탁사에만 해당
-      let newData: any[] = []; 
+      let newData: any[] = [];
       checklistData.map((x: any) => {
-        let d = JSON.parse(consigneeData.first_check_consignee_temp_data).find((a:any) => a.id == x.id); 
+        let d = JSON.parse(consigneeData.first_check_consignee_temp_data).find((a:any) => a.id == x.id);
         x = {...x, ...d};
         console.log(x)
         newData.push(x)
       })
-      setCheckDataArray(newData);   
-    }else if( consigneeData.state == 1 && consigneeData.sub_state == 2 ){  //- 검수중  
+      setCheckDataArray(newData);
+    }else if( consigneeData.state == 1 && consigneeData.sub_state == 2 ){  //- 검수중
       console.log(JSON.parse(consigneeData.first_check_data))
-      setCheckDataArray(JSON.parse(consigneeData.first_check_data)); 
-    }else if( consigneeData.state == 1 && consigneeData.sub_state == 3 ){  //- 최초점검완료단계  
-      if(userType != 1) {  
-        setCheckDataArray(JSON.parse(consigneeData.first_check_admin_temp_data)); 
-      } 
-    }else if( consigneeData.state == 2 && consigneeData.sub_state == 1 ){  //- 보완자료요청, 이행점검대기단계 
+      setCheckDataArray(JSON.parse(consigneeData.first_check_data));
+    }else if( consigneeData.state == 1 && consigneeData.sub_state == 3 ){  //- 최초점검완료단계
+      if(userType != 1) {
+        setCheckDataArray(JSON.parse(consigneeData.first_check_admin_temp_data));
+      }
+    }else if( consigneeData.state == 2 && consigneeData.sub_state == 1 ){  //- 보완자료요청, 이행점검대기단계
       if(userType == 1) {  //수탁사인 경우
-        setCheckDataArray(JSON.parse(consigneeData.imp_check_consignee_temp_data)); 
+        setCheckDataArray(JSON.parse(consigneeData.imp_check_consignee_temp_data));
       }else{ //어드민인 경우
-        setCheckDataArray(JSON.parse(consigneeData.imp_check_data)); 
-      } 
+        setCheckDataArray(JSON.parse(consigneeData.imp_check_data));
+      }
     }else{
-      setCheckDataArray(JSON.parse(consigneeData.imp_check_data)); 
-    } 
+      setCheckDataArray(JSON.parse(consigneeData.imp_check_data));
+    }
   }, [checklistData]);
   const onDownload = () => {
-    
-      let newData: any[] = []; 
+
+      let newData: any[] = [];
       checklistData.map((x: any) => {
-        let d = checkDataArray.find((a:any) => a.id == x.id); 
+        let d = checkDataArray.find((a:any) => a.id == x.id);
         x = {...x, ...d};
         console.log(x)
         newData.push(x)
@@ -254,7 +253,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
   function downloadFile(data: any, filename: string, type: string) {
     const blob = new Blob([data], { type: type });
     const url = window.URL.createObjectURL(blob);
-    
+
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
@@ -264,14 +263,14 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
     document.body.removeChild(a);
   }
   const onSave = async() => {   //임시저장
-    const currentDate = new Date().toLocaleDateString();  
+    const currentDate = new Date().toLocaleDateString();
     checkDataArray.forEach(item => {
-      item.modify_time = currentDate;  
+      item.modify_time = currentDate;
     });
     var response ;
     if(checkExcept==true){ //점검제외
       response = await axiosPost(`${API_URL}/project_detail/Update`, {
-        id: consigneeData.id, 
+        id: consigneeData.id,
         state: 3,
         except_type: exceptType,
         except_reason: exceptReason
@@ -279,104 +278,104 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
     }
     else if(consigneeData.state == 1 && consigneeData.sub_state == 1){ //- 자가점검 중 :: 수탁사에만 해당
       response = await axiosPost(`${API_URL}/project_detail/Update`, {
-        id: consigneeData.id, 
+        id: consigneeData.id,
         request_content: request_content,
         project_attachment : project_attachment,
         first_check_consginee_temp_data: JSON.stringify(checkDataArray)
       });
-    }else if( consigneeData.state == 1 && consigneeData.sub_state == 2 ){  //- 검수중  
+    }else if( consigneeData.state == 1 && consigneeData.sub_state == 2 ){  //- 검수중
       if(userType == 1) {  //수탁사인 경우
         response = await axiosPost(`${API_URL}/project_detail/Update`, {
-          id: consigneeData.id,  
+          id: consigneeData.id,
           request_content: request_content,
           project_attachment : project_attachment,
           first_check_consignee_temp_data: JSON.stringify(checkDataArray),
         });
       }else{ //어드민인 경우
         response = await axiosPost(`${API_URL}/project_detail/Update`, {
-          id: consigneeData.id,  
+          id: consigneeData.id,
           request_content: request_content,
           project_attachment : project_attachment,
           first_check_admin_temp_data: JSON.stringify(checkDataArray),
         });
-      } 
-    }else if( consigneeData.state == 1 && consigneeData.sub_state == 3 ){  //- 최초점검완료단계  
-      if(userType != 1) {  
+      }
+    }else if( consigneeData.state == 1 && consigneeData.sub_state == 3 ){  //- 최초점검완료단계
+      if(userType != 1) {
         response = await axiosPost(`${API_URL}/project_detail/Update`, {
-          id: consigneeData.id,  
+          id: consigneeData.id,
           request_content: request_content,
           project_attachment : project_attachment,
           first_check_admin_temp_data: JSON.stringify(checkDataArray),
         });
-      } 
-    }else if( consigneeData.state == 2 && consigneeData.sub_state == 1 ){  //- 보완자료요청, 이행점검대기단계 
+      }
+    }else if( consigneeData.state == 2 && consigneeData.sub_state == 1 ){  //- 보완자료요청, 이행점검대기단계
       if(userType == 1) {  //수탁사인 경우
         response = await axiosPost(`${API_URL}/project_detail/Update`, {
-          id: consigneeData.id,  
+          id: consigneeData.id,
           request_content: request_content,
           project_attachment : project_attachment,
           imp_check_consignee_temp_data: JSON.stringify(checkDataArray),
         });
       }else{ //어드민인 경우
         response = await axiosPost(`${API_URL}/project_detail/Update`, {
-          id: consigneeData.id,  
+          id: consigneeData.id,
           request_content: request_content,
           project_attachment : project_attachment,
           imp_check_data: JSON.stringify(checkDataArray),
         });
-      } 
+      }
     }else{
       response = await axiosPost(`${API_URL}/project_detail/Update`, {
-        id: consigneeData.id, 
+        id: consigneeData.id,
         request_content: request_content,
         project_attachment : project_attachment,
         imp_check_data: JSON.stringify(checkDataArray)
       });
     }
-    
-    
-    if (response.data.result == 'SUCCESS') { 
+
+
+    if (response.data.result == 'SUCCESS') {
       setModalMsg('정확히 저장되었습니다.')
       setShowModal(true)
     }
     else {
       setModalMsg(response.data.error_message)
       setShowModal(true)
-    }  
+    }
     setCheckDataArray(checkDataArray);
   }
   const onRequest = async() => {   //보완요청
-    const currentDate = new Date().toLocaleDateString();  
+    const currentDate = new Date().toLocaleDateString();
     checkDataArray.forEach(item => {
-      item.modify_time = currentDate;  
+      item.modify_time = currentDate;
     });
     var response ;
     if(checkExcept==true){ //점검제외
       response = await axiosPost(`${API_URL}/project_detail/Update`, {
-        id: consigneeData.id, 
+        id: consigneeData.id,
         state: 3,
         except_type: exceptType,
         except_reason: exceptReason
       });
     }
-    else if( consigneeData.state == 1 && consigneeData.sub_state == 2 ){  //- 검수중  
+    else if( consigneeData.state == 1 && consigneeData.sub_state == 2 ){  //- 검수중
        //어드민인 경우
       response = await axiosPost(`${API_URL}/project_detail/Update`, {
-        id: consigneeData.id,  
+        id: consigneeData.id,
         request_content: request_content,
         project_attachment : project_attachment,
         first_check_consignee_temp_data: JSON.stringify(checkDataArray),
         first_check_data: JSON.stringify(checkDataArray),
-      }); 
-    }else if( consigneeData.state == 1 && consigneeData.sub_state == 3 ){  //- 최초점검완료단계  
+      });
+    }else if( consigneeData.state == 1 && consigneeData.sub_state == 3 ){  //- 최초점검완료단계
       response = await axiosPost(`${API_URL}/project_detail/Update`, {
-        id: consigneeData.id,  
+        id: consigneeData.id,
         request_content: request_content,
         project_attachment : project_attachment,
         imp_check_consignee_temp_data: JSON.stringify(checkDataArray),
         imp_check_data: JSON.stringify(checkDataArray),
       });
-    }else if( consigneeData.state == 2 && consigneeData.sub_state == 1 ){  //- 보완자료요청, 이행점검대기단계 
+    }else if( consigneeData.state == 2 && consigneeData.sub_state == 1 ){  //- 보완자료요청, 이행점검대기단계
       response = await axiosPost(`${API_URL}/project_detail/Update`, {
         id: consigneeData.id,
         request_content: request_content,
@@ -385,29 +384,29 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
         imp_check_data: JSON.stringify(checkDataArray),
         turn:1,
       });
-    }else{ 
+    }else{
     }
-    
-    
-    if (response.data.result == 'SUCCESS') { 
+
+
+    if (response.data.result == 'SUCCESS') {
       setModalMsg('정확히 저장되었습니다.')
       setShowModal(true)
     }
     else {
       setModalMsg(response.data.error_message)
       setShowModal(true)
-    }  
+    }
     setCheckDataArray(checkDataArray);
   }
   const consigneeSubmit = async() => {
-    const currentDate = new Date().toLocaleDateString();  
+    const currentDate = new Date().toLocaleDateString();
     checkDataArray.forEach(item => {
-      item.modify_time = currentDate;  
+      item.modify_time = currentDate;
     });
     var response ;
     if(checkExcept==true){ //점검제외
       response = await axiosPost(`${API_URL}/project_detail/Update`, {
-        id: consigneeData.id, 
+        id: consigneeData.id,
         state: 3,
         except_type: exceptType,
         except_reason: exceptReason
@@ -415,73 +414,73 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
     }
     else if(consigneeData.state == 1 && consigneeData.sub_state == 1){ //- 자가점검 중 :: 수탁사에만 해당
       response = await axiosPost(`${API_URL}/project_detail/Update`, {
-        id: consigneeData.id, 
+        id: consigneeData.id,
         first_check_consginee_temp_data: JSON.stringify(checkDataArray),
         first_check_data: JSON.stringify(checkDataArray),
-        turn:0, 
+        turn:0,
         state:1,
-        sub_state: 2, 
+        sub_state: 2,
         request_content: request_content,
         project_attachment : project_attachment,
-      });  
-    }else if( consigneeData.state == 1 && consigneeData.sub_state == 2 ){  //- 검수중  
+      });
+    }else if( consigneeData.state == 1 && consigneeData.sub_state == 2 ){  //- 검수중
       let firstCheckScore = 0;
       checkDataArray.forEach((item: any) => {
         if (item.check_result === "Y") {
           firstCheckScore++;
         }
-      }); 
+      });
       const totalItems = checkDataArray.length;
       firstCheckScore = (firstCheckScore / totalItems) * 100;
       let first_check_miss_count  = checkDataArray.filter((item: any) => item['check_result'] === 'N').length;
 
       if(userType == 1) {  //수탁사인 경우
         response = await axiosPost(`${API_URL}/project_detail/Update`, {
-          id: consigneeData.id, 
+          id: consigneeData.id,
           first_check_admin_temp_data: JSON.stringify(checkDataArray),
           first_check_data: JSON.stringify(checkDataArray),
-          turn:0, 
+          turn:0,
           state:1,
           sub_state: 3,
-          first_check_score: firstCheckScore, 
+          first_check_score: firstCheckScore,
           first_check_miss_count: first_check_miss_count,
           request_content: request_content,
           project_attachment : project_attachment,
         });
       }else{ //어드민인 경우
         response = await axiosPost(`${API_URL}/project_detail/Update`, {
-          id: consigneeData.id, 
+          id: consigneeData.id,
           first_check_admin_temp_data: JSON.stringify(checkDataArray),
           first_check_data: JSON.stringify(checkDataArray),
-          turn:0, 
+          turn:0,
           state:1,
           sub_state: 3,
-          first_check_score: firstCheckScore, 
+          first_check_score: firstCheckScore,
           first_check_miss_count: first_check_miss_count,
           request_content: request_content,
           project_attachment : project_attachment,
         });
-      } 
-    }else if( consigneeData.state == 1 && consigneeData.sub_state == 3 ){  //- 최초점검완료단계  
-      if(userType != 1) {  
+      }
+    }else if( consigneeData.state == 1 && consigneeData.sub_state == 3 ){  //- 최초점검완료단계
+      if(userType != 1) {
         response = await axiosPost(`${API_URL}/project_detail/Update`, {
-          id: consigneeData.id, 
+          id: consigneeData.id,
           imp_check_data: JSON.stringify(checkDataArray),
           imp_check_consignee_temp_data: JSON.stringify(checkDataArray),
-          turn:2, 
+          turn:2,
           state:2,
           sub_state: 1,
           request_content: request_content,
           project_attachment : project_attachment,
         });
-      } 
-    }else if( consigneeData.state == 2 && consigneeData.sub_state == 1 ){  //- 보완자료요청, 이행점검대기단계 
+      }
+    }else if( consigneeData.state == 2 && consigneeData.sub_state == 1 ){  //- 보완자료요청, 이행점검대기단계
       if(userType == 1) {  //수탁사인 경우
         response = await axiosPost(`${API_URL}/project_detail/Update`, {
-          id: consigneeData.id, 
+          id: consigneeData.id,
           imp_check_data: JSON.stringify(checkDataArray),
           imp_check_admin_temp_data: JSON.stringify(checkDataArray),
-          turn:0, 
+          turn:0,
           state:2,
           sub_state: 2,
           request_content: request_content,
@@ -494,16 +493,16 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
         if (item.result === "N") {
           imp_check_score++;
         }
-      }); 
+      });
       const totalItems = checkDataArray.length;
       imp_check_score = (imp_check_score / totalItems) * 100;
       let imp_check_miss_count  = checkDataArray.filter((item: any) => item['result'] === 'N').length;
 
       response = await axiosPost(`${API_URL}/project_detail/Update`, {
-        id: consigneeData.id, 
+        id: consigneeData.id,
         imp_check_data: JSON.stringify(checkDataArray),
         imp_check_admin_temp_data: JSON.stringify(checkDataArray),
-        turn:3, 
+        turn:3,
         state:2,
         sub_state: 3,
         imp_check_score : imp_check_score,
@@ -511,17 +510,17 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
         request_content: request_content,
         project_attachment : project_attachment,
       });
-    } 
-     
+    }
+
     if (response.data.result == 'SUCCESS') {
       setModalMsg('정확히 제출되었습니다.')
       setShowModal(true)
     }
   }
-  return(  
+  return(
       <Box>
-         <Box display={'flex'} justifyContent={'flex-end'} > 
-         <Typography sx={{mr:3}}>{consigneeData.company_name}상세점검결과</Typography>  
+         <Box display={'flex'} justifyContent={'flex-end'} >
+         <Typography sx={{mr:3}}>{consigneeData.company_name}상세점검결과</Typography>
          <Typography>점검일{consigneeData.first_check_date}</Typography></Box>
       {((userType == 0 || userType == 3 )&& !(consigneeData.sub_state == 1 && consigneeData.state == 1) ) ? ( //어드민이면서 자가점검이 아닐 경우에만 현시
         <>
@@ -532,7 +531,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
               sx={{width:160, ml:1}}
             >
               수탁사 입력 활성화
-            </Button> 
+            </Button>
 
             <Button
               variant={'contained'}
@@ -541,7 +540,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
               onClick={onDownload}
             >
               다운로드
-            </Button> 
+            </Button>
             <Button
               variant={'contained'}
               color={"primary"}
@@ -549,7 +548,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
               onClick={onSave}
             >
               임시 저장
-            </Button> 
+            </Button>
             <Button
               variant={'contained'}
               color={"primary"}
@@ -557,7 +556,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
               onClick={onRequest}
             >
               보완 요청
-            </Button> 
+            </Button>
             <Button
               variant={'contained'}
               color={"primary"}
@@ -565,7 +564,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
               onClick={consigneeSubmit}
             >
                { (consigneeData.sub_state == 2 && consigneeData.state == 2)  ? '최종 저장' : '검수 완료'}
-            </Button> 
+            </Button>
           </Box>
 
           <Box sx={{display: 'flex', mt: 1}}>
@@ -576,9 +575,9 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
               onClick={onIssue}
             >
               이슈 업체 등록
-            </Button> 
+            </Button>
 
-            
+
             <Box sx={{ml: 'auto', border: 1, borderRadius: 0}}>
               <Box sx={{borderRadius: 0, borderBottom: 1, display: 'flex', justifyContent: 'center', p: 1}}>
                 <FormControlLabel
@@ -597,7 +596,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                 <CustomSelect
                   labelId="month-dd"
                   id="month-dd"
-                  size="small" 
+                  size="small"
                   value={exceptType}
                   sx={{width:150, mr:2}}
                   onChange = {(e:any) => {
@@ -657,10 +656,10 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                   onClick={onCheckAll}
                 >
                   일괄적용
-                </Button> 
+                </Button>
               </Box>
             </Box>
-            
+
           </Box>
         </>
           ) : (userType == 1) ? (
@@ -674,7 +673,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
               onClick={onSave}
             >
               임시 저장
-            </Button> 
+            </Button>
             <Button
               variant={'contained'}
               color={"primary"}
@@ -682,7 +681,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
               onClick={onDownload}
             >
               다운로드
-            </Button> 
+            </Button>
             <Button
               variant={'contained'}
               color={"primary"}
@@ -690,10 +689,10 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
               onClick={consigneeSubmit}
             >
               제출
-            </Button> 
+            </Button>
           </Box>
 
-          
+
         </>
       ) : (
         <></>
@@ -701,17 +700,17 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
 
       <Box display={'flex'} justifyContent={'flex-start'} alignItems={'center'}>
          <Typography sx={{mt: 1}}>전달사항:</Typography>
-          <TextField  
+          <TextField
             sx={{width:500}}
-            variant="outlined" 
+            variant="outlined"
             value={request_content==''  ?  consigneeData.request_content : request_content}
-          
-            onChange={(e:any) => {  
+
+            onChange={(e:any) => {
               setRequestContent(e.target.value)
             }}
             required
           />
-          
+
             <Row align={'middle'}>
             <InputLabel htmlFor="file-upload" style={{textAlign:'center', width:80, borderBottom: '1px solid black' }} component="label">
               파일 업로드
@@ -730,53 +729,53 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
             encodeURIComponent(project_attachment != '' ? project_attachment : consigneeData.project_attachment)}`}>
               { (project_attachment != '' ? project_attachment : consigneeData.project_attachment)}
             </a>
-            
+
       </Box>
-   
-          
+
+
       { !((userType == 0 || userType == 3 )&&consigneeData.sub_state == 1 && consigneeData.state == 1)  ?
         <TableContainer component={Paper}>
           <TableHead >
-            <TableRow sx={{backgroundColor:'success'}}> 
+            <TableRow sx={{backgroundColor:'success'}}>
               <TableCell style={{ textAlign: 'center'}}>영역</TableCell>
               <TableCell style={{ textAlign: 'center'}}>분야</TableCell>
               <TableCell style={{ textAlign: 'center'}}>항목</TableCell>
               <TableCell style={{ textAlign: 'center'}}>세부 점검 항목</TableCell>
               <TableCell style={{ textAlign: 'center'}}>점검결과</TableCell>
-              <TableCell style={{ textAlign: 'center'}}>중적첨부</TableCell> 
-              <TableCell style={{ textAlign: 'center'}}>검수결과</TableCell> 
-              <TableCell style={{ textAlign: 'center'}}>보완조치</TableCell> 
-              <TableCell style={{ textAlign: 'center'}}>최종결과</TableCell> 
-              <TableCell style={{ textAlign: 'center'}}>최근 수정 날짜</TableCell> 
+              <TableCell style={{ textAlign: 'center'}}>중적첨부</TableCell>
+              <TableCell style={{ textAlign: 'center'}}>검수결과</TableCell>
+              <TableCell style={{ textAlign: 'center'}}>보완조치</TableCell>
+              <TableCell style={{ textAlign: 'center'}}>최종결과</TableCell>
+              <TableCell style={{ textAlign: 'center'}}>최근 수정 날짜</TableCell>
               {(userType == 0 || userType == 3) && <TableCell style={{ textAlign: 'center'}}>Lock</TableCell> }
-              <TableCell style={{ textAlign: 'center'}}>상세</TableCell> 
+              <TableCell style={{ textAlign: 'center'}}>상세</TableCell>
             </TableRow>
-          </TableHead> 
-            <TableBody> 
+          </TableHead>
+            <TableBody>
               {checklistData.map((row:any, rowIndex) => (
-                
+
                 <TableRow key={row.id}>
-                  {Object.keys(row).map((key, colIndex) => {  
+                  {Object.keys(row).map((key, colIndex) => {
                     return colIndex == 2 &&  row.merged1 !== 0 ?
                       (
                       <TableCell
                         key={colIndex}
                         style={{ textAlign: 'center', cursor: 'pointer' }}
-                        rowSpan={row.merged1 > 0 ? row.merged1 : 1} 
+                        rowSpan={row.merged1 > 0 ? row.merged1 : 1}
                         sx={{width:200, pa:0}}
                       >
 
-                          <TextareaAutosize 
-                            value={row.area} 
-                            style={{ 
-                              width: "100%", 
-                              minHeight: 32, 
-                              resize: "none", 
-                              border: "none", 
+                          <TextareaAutosize
+                            value={row.area}
+                            style={{
+                              width: "100%",
+                              minHeight: 32,
+                              resize: "none",
+                              border: "none",
                               outline: "none",
                               pointerEvents: "none" // 입력 비활성화
-                            }} 
-                          /> 
+                            }}
+                          />
                       </TableCell>
                     )
                     : colIndex == 3 &&  row.merged2 !== 0 ?
@@ -784,20 +783,20 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                       <TableCell
                         key={colIndex}
                         style={{ textAlign: 'center', cursor: 'pointer'}}
-                        rowSpan={row.merged2 > 0 ? row.merged2 : 1} 
+                        rowSpan={row.merged2 > 0 ? row.merged2 : 1}
                         sx={{width:250}}
                       >
-                          <TextareaAutosize 
-                            value={row.domain} 
-                            style={{ 
-                              width: "100%", 
-                              minHeight: 32, 
-                              resize: "none", 
-                              border: "none", 
+                          <TextareaAutosize
+                            value={row.domain}
+                            style={{
+                              width: "100%",
+                              minHeight: 32,
+                              resize: "none",
+                              border: "none",
                               outline: "none",
                               pointerEvents: "none" // 입력 비활성화
-                            }} 
-                          />  
+                            }}
+                          />
                       </TableCell>
                     )
                     : colIndex == 4  ?
@@ -805,19 +804,19 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                       <TableCell
                         key={colIndex}
                         style={{ textAlign: 'center', cursor: 'pointer'}}
-                        
+
                         sx={{width:250}}
                       >
-                          <TextareaAutosize 
-                          value={row.item} 
-                          style={{ 
-                            width: "100%", 
-                            minHeight: 32, 
-                            resize: "none", 
-                            border: "none", 
+                          <TextareaAutosize
+                          value={row.item}
+                          style={{
+                            width: "100%",
+                            minHeight: 32,
+                            resize: "none",
+                            border: "none",
                             outline: "none",
                             pointerEvents: "none" // 입력 비활성화
-                          }} 
+                          }}
                         />
                       </TableCell>
                     ): colIndex == 5  ?
@@ -826,16 +825,16 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                         style={{ cursor: 'pointer'}}
                         sx={{width:700}}
                       >
-                          <TextareaAutosize 
-                            value={row.detail_item} 
-                            style={{ 
-                              width: "100%", 
-                              minHeight: 32, 
-                              resize: "none", 
-                              border: "none", 
+                          <TextareaAutosize
+                            value={row.detail_item}
+                            style={{
+                              width: "100%",
+                              minHeight: 32,
+                              resize: "none",
+                              border: "none",
                               outline: "none",
                               pointerEvents: "none" // 입력 비활성화
-                            }} 
+                            }}
                           />
                           {expandedRow === rowIndex && (
                             <>
@@ -846,13 +845,13 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                                 sx={{width:80}}
                               >
                                 설명
-                              </Button> 
+                              </Button>
                               <Typography sx={{mt: 1}}>현황</Typography>
-                              <TextField  
+                              <TextField
                                 fullWidth
-                                variant="outlined" 
+                                variant="outlined"
                                 value={row.current_status}
-                              
+
                                 onChange={(e:any) => {
                                   let newData: any[] = [];
                                   checklistData.map((x) => {
@@ -865,43 +864,43 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                                   setChecklistData(newData)
                                 }}
                                 required
-                              /> 
+                              />
                               <Typography sx={{mt: 1}}>보완 요청 사항</Typography>
-                              <TextField  
+                              <TextField
                                 fullWidth
-                                variant="outlined" 
+                                variant="outlined"
                                 value={row.modify_request}
-                              
+
                                 required
-                              /> 
+                              />
                               <Typography sx={{mt: 1}}>점검 결과 의견</Typography>
-                              <TextField  
+                              <TextField
                                 fullWidth
-                                variant="outlined" 
+                                variant="outlined"
                                 value={row.check_suggestion}
-                              
-                                
+
+
                                 required
-                              /> 
+                              />
                             </>
                           )}
                       </TableCell>
-                     
-                    : null;
-                  })} 
 
-                     <TableCell 
-                        style={{ textAlign: 'center', cursor: 'pointer'}} 
+                    : null;
+                  })}
+
+                     <TableCell
+                        style={{ textAlign: 'center', cursor: 'pointer'}}
                         sx={{width:100}}
                       >
-                        {(expandedRow === rowIndex && 
-                        !(consigneeData.sub_state == 2 && consigneeData.state == 2 && userType == 1 && 
+                        {(expandedRow === rowIndex &&
+                        !(consigneeData.sub_state == 2 && consigneeData.state == 2 && userType == 1 &&
                           (checkDataArray.filter((x:any)=> x.id == row.id).length==0? false
                            :checkDataArray.filter((x:any)=> x.id == row.id)[0].lock == 'Y'))) ? (
                           <CustomSelect
                             id="account-type-select"
                             sx={{ width: 70 }}
-                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].self_check_result} 
+                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].self_check_result}
                             onChange={(event:any) => {
                               let newData: any[] = [];
                               checkDataArray.map((x) => {
@@ -911,7 +910,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                                 newData.push(x)
                               })
                               setCheckDataArray(newData)
-                            }} 
+                            }}
                           >
                             <MenuItem value={'Y'}>Y</MenuItem>
                             <MenuItem value={'N'}>N</MenuItem>
@@ -920,27 +919,27 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                         ) : (
                           <TextareaAutosize
                             value={checkDataArray.filter((x:any) => x.id === row.id).length === 0 ? '' : checkDataArray.filter((x:any) => x.id === row.id)[0].self_check_result}
-                            style={{ 
-                              width: "100%", 
-                              minHeight: 32, 
-                              resize: "none", 
-                              border: "none",  
+                            style={{
+                              width: "100%",
+                              minHeight: 32,
+                              resize: "none",
+                              border: "none",
                               outline: "none",
                               pointerEvents: "none", // 입력 비활성화
                               color: checkDataArray.filter((x:any) => x.id === row.id).length === 0 ? 'black' : checkDataArray.filter((x:any) => x.id === row.id)[0].self_check_result === 'Y' ? 'blue' : checkDataArray.filter((x:any) => x.id === row.id)[0].self_check_result === 'N' ? 'red' : 'black'
-                            }} 
+                            }}
                           />
 
                         )}
-                          
+
                       </TableCell>
-                      
-                   <TableCell 
-                        style={{ textAlign: 'center', cursor: 'pointer'}} 
+
+                   <TableCell
+                        style={{ textAlign: 'center', cursor: 'pointer'}}
                         sx={{width:100}}
-                      > 
-                      
-                      
+                      >
+
+
                       {/* {selectedFile ? (
                         <Chip
                           style={{ marginLeft: 2 }}
@@ -955,10 +954,10 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                           onDelete={handleAttachmentDelete}
                         />}
                         </>
-                      )} */} 
-                      
-                      {(expandedRow === rowIndex && 
-                        !(consigneeData.sub_state == 2 && consigneeData.state == 2 && userType == 1 && 
+                      )} */}
+
+                      {(expandedRow === rowIndex &&
+                        !(consigneeData.sub_state == 2 && consigneeData.state == 2 && userType == 1 &&
                           (checkDataArray.filter((x:any)=> x.id == row.id).length==0? false
                            :checkDataArray.filter((x:any)=> x.id == row.id)[0].lock == 'Y'))) ? (
                         <Box>
@@ -966,9 +965,9 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                             <a href={`${API_URL}/checkinfo/Attachment?file_name=${
                               encodeURIComponent(row.filename)}`}>
                                 {row.filename}
-                            </a> 
+                            </a>
                           </Box>
-                          
+
                           <a href={`${API_URL}/checkinfo/Attachment2?file_name=${encodeURIComponent(checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].attachment)}`}>{checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].attachment}</a>
                          <Row align={'middle'}>
                          <InputLabel htmlFor="file-upload" style={{textAlign:'center', width:80, borderBottom: '1px solid black' }} component="label">
@@ -987,7 +986,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                           <CustomSelect
                             id="account-type-select"
                             sx={{ width: 70 }}
-                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].attachment=='' ? 'N' : 'Y'} 
+                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].attachment=='' ? 'N' : 'Y'}
                             onChange={(event:any) => {
                               let newData: any[] = [];
                               checkDataArray.map((x) => {
@@ -995,44 +994,44 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                                   x.attachment = event.target.value=='Y'? attachment : '' ;
                                 }
                                 newData.push(x)
-                              }) 
-                              setCheckDataArray(newData) 
-                            }} 
+                              })
+                              setCheckDataArray(newData)
+                            }}
                           >
                             <MenuItem value={'Y'}>Y</MenuItem>
                             <MenuItem value={'N'}>N</MenuItem>
                           </CustomSelect>
                           </Box>
                         ) : (
-                          <TextareaAutosize 
-                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].attachment=='' ? 'N' : 'Y'} 
-                            style={{ 
-                              width: "100%", 
-                              minHeight: 32, 
-                              resize: "none", 
-                              border: "none", 
+                          <TextareaAutosize
+                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].attachment=='' ? 'N' : 'Y'}
+                            style={{
+                              width: "100%",
+                              minHeight: 32,
+                              resize: "none",
+                              border: "none",
                               outline: "none",
                               color:checkDataArray.filter((x:any)=> x.id == row.id).length==0?'black':checkDataArray.filter((x:any)=> x.id == row.id)[0].attachment=='' ? 'black' : 'blue',
                               pointerEvents: "none" // 입력 비활성화
-                            }} 
+                            }}
                           />
                         )
                     }
                   </TableCell>
-                    
-                  <TableCell 
+
+                  <TableCell
                       style={{ textAlign: 'center', cursor: 'pointer'}}
-                      
+
                       sx={{width:100}}
                     >
-                        {(expandedRow === rowIndex && 
-                        !(consigneeData.sub_state == 2 && consigneeData.state == 2 && userType == 1 && 
+                        {(expandedRow === rowIndex &&
+                        !(consigneeData.sub_state == 2 && consigneeData.state == 2 && userType == 1 &&
                           (checkDataArray.filter((x:any)=> x.id == row.id).length==0? false
                            :checkDataArray.filter((x:any)=> x.id == row.id)[0].lock == 'Y'))) ? (
                           <CustomSelect
                             id="account-type-select"
                             sx={{ width: 70 }}
-                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].check_result} 
+                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].check_result}
                             onChange={(event:any) => {
                               let newData: any[] = [];
                               checkDataArray.map((x) => {
@@ -1043,44 +1042,44 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                               })
 
                               setCheckDataArray(newData)
-                              
-                            }} 
+
+                            }}
                           >
                             <MenuItem value={'Y'}>Y</MenuItem>
                             <MenuItem value={'N'}>N</MenuItem>
                             <MenuItem value={'N/A'}>N/A</MenuItem>
                           </CustomSelect>
                         ) : (
-                          <TextareaAutosize 
+                          <TextareaAutosize
                             value={checkDataArray.filter((x:any) => x.id === row.id).length === 0 ? '' : checkDataArray.filter((x:any) => x.id === row.id)[0].check_result}
-                            style={{ 
-                              width: "100%", 
-                              minHeight: 32, 
-                              resize: "none", 
-                              border: "none", 
+                            style={{
+                              width: "100%",
+                              minHeight: 32,
+                              resize: "none",
+                              border: "none",
                               outline: "none",
                               pointerEvents: "none", // 입력 비활성화
                               color: checkDataArray.filter((x:any) => x.id === row.id).length === 0 ? 'black' : checkDataArray.filter((x:any) => x.id === row.id)[0].check_result === 'Y' ? 'blue' : checkDataArray.filter((x:any) => x.id === row.id)[0].check_result === 'N' ? 'red' : 'black'
-                            }} 
+                            }}
                           />
 
                         )}
-                        
+
                   </TableCell>
-                    
-                  <TableCell 
+
+                  <TableCell
                       style={{ textAlign: 'center', cursor: 'pointer'}}
-                      
+
                       sx={{width:100}}
-                    > 
-                        {(expandedRow === rowIndex && 
-                        !(consigneeData.sub_state == 2 && consigneeData.state == 2 && userType == 1 && 
+                    >
+                        {(expandedRow === rowIndex &&
+                        !(consigneeData.sub_state == 2 && consigneeData.state == 2 && userType == 1 &&
                           (checkDataArray.filter((x:any)=> x.id == row.id).length==0? false
                            :checkDataArray.filter((x:any)=> x.id == row.id)[0].lock == 'Y'))) ? (
                           <CustomSelect
                             id="account-type-select"
                             sx={{ width: 70 }}
-                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].additional} 
+                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].additional}
                             onChange={(event:any) => {
                               let newData: any[] = [];
                               checkDataArray.map((x) => {
@@ -1099,37 +1098,37 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                         ) : (
                           <TextareaAutosize
                             value={checkDataArray.filter((x:any) => x.id === row.id).length === 0 ? '' : checkDataArray.filter((x:any) => x.id === row.id)[0].additional}
-                            style={{ 
-                              width: "100%", 
-                              minHeight: 32, 
-                              resize: "none", 
-                              border: "none", 
+                            style={{
+                              width: "100%",
+                              minHeight: 32,
+                              resize: "none",
+                              border: "none",
                               outline: "none",
                               pointerEvents: "none", // 입력 비활성화
-                              color: checkDataArray.filter((x:any) => x.id === row.id).length === 0 
+                              color: checkDataArray.filter((x:any) => x.id === row.id).length === 0
                                 ? 'black' // checkDataArray에 해당 id가 없는 경우 검은색으로
-                                : checkDataArray.filter((x:any) => x.id === row.id)[0].additional === 'Y' 
+                                : checkDataArray.filter((x:any) => x.id === row.id)[0].additional === 'Y'
                                   ? 'blue' // additional 값이 'Y'인 경우 푸른색으로
-                                  : checkDataArray.filter((x:any) => x.id === row.id)[0].additional === 'N' 
+                                  : checkDataArray.filter((x:any) => x.id === row.id)[0].additional === 'N'
                                     ? 'red' // additional 값이 'N'인 경우 빨간색으로
                                     : 'black' // 그 외의 경우 검은색으로
-                            }} 
+                            }}
                           />
                         )}
                   </TableCell>
-                    
-                  <TableCell 
-                      style={{ textAlign: 'center', cursor: 'pointer'}} 
+
+                  <TableCell
+                      style={{ textAlign: 'center', cursor: 'pointer'}}
                       sx={{width:100}}
                     >
-                        {(expandedRow === rowIndex && 
-                        !(consigneeData.sub_state == 2 && consigneeData.state == 2 && userType == 1 && 
+                        {(expandedRow === rowIndex &&
+                        !(consigneeData.sub_state == 2 && consigneeData.state == 2 && userType == 1 &&
                           (checkDataArray.filter((x:any)=> x.id == row.id).length==0? false
                            :checkDataArray.filter((x:any)=> x.id == row.id)[0].lock == 'Y'))) ? (
                           <CustomSelect
                             id="account-type-select"
                             sx={{ width: 70 }}
-                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].result} 
+                            value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].result}
                             onChange={(event:any) => {
                               let newData: any[] = [];
                               checkDataArray.map((x) => {
@@ -1137,9 +1136,9 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                                   x.result = event.target.value;
                                 }
                                 newData.push(x)
-                              }) 
-                              setCheckDataArray(newData) 
-                            }} 
+                              })
+                              setCheckDataArray(newData)
+                            }}
                           >
                             <MenuItem value={'Y'}>Y</MenuItem>
                             <MenuItem value={'N'}>N</MenuItem>
@@ -1148,47 +1147,47 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                         ) : (
                           <TextareaAutosize
                             value={checkDataArray.filter((x:any) => x.id === row.id).length === 0 ? '' : checkDataArray.filter((x:any) => x.id === row.id)[0].result}
-                            style={{ 
-                              width: "100%", 
-                              minHeight: 32, 
-                              resize: "none", 
-                              border: "none", 
+                            style={{
+                              width: "100%",
+                              minHeight: 32,
+                              resize: "none",
+                              border: "none",
                               outline: "none",
                               pointerEvents: "none", // 입력 비활성화
-                              color: checkDataArray.filter((x:any) => x.id === row.id).length === 0 
+                              color: checkDataArray.filter((x:any) => x.id === row.id).length === 0
                                 ? 'black' // checkDataArray에 해당 id가 없는 경우 검은색으로
-                                : checkDataArray.filter((x:any) => x.id === row.id)[0].result === 'Y' 
+                                : checkDataArray.filter((x:any) => x.id === row.id)[0].result === 'Y'
                                   ? 'blue' // result 값이 'Y'인 경우 푸른색으로
-                                  : checkDataArray.filter((x:any) => x.id === row.id)[0].result === 'N' 
+                                  : checkDataArray.filter((x:any) => x.id === row.id)[0].result === 'N'
                                     ? 'red' // result 값이 'N'인 경우 빨간색으로
                                     : 'black' // 그 외의 경우 검은색으로
-                            }} 
+                            }}
                           />
 
                         )}
                   </TableCell>
-                    
-                  <TableCell 
-                      style={{ textAlign: 'center', cursor: 'pointer'}} 
+
+                  <TableCell
+                      style={{ textAlign: 'center', cursor: 'pointer'}}
                       sx={{width:120}}
                     >
-                     
-                        <TextareaAutosize 
-                          value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].modify_time} 
-                          style={{ 
-                            width: "100%", 
-                            minHeight: 32, 
-                            resize: "none", 
-                            border: "none", 
+
+                        <TextareaAutosize
+                          value={checkDataArray.filter((x:any)=> x.id == row.id).length==0?'':checkDataArray.filter((x:any)=> x.id == row.id)[0].modify_time}
+                          style={{
+                            width: "100%",
+                            minHeight: 32,
+                            resize: "none",
+                            border: "none",
                             outline: "none",
                             pointerEvents: "none" // 입력 비활성화
-                          }} 
-                        /> 
+                          }}
+                        />
                   </TableCell>
 
-                  {(userType == 0 || userType == 3) && <TableCell 
+                  {(userType == 0 || userType == 3) && <TableCell
                   style={{ textAlign: 'center', cursor: 'pointer'}}
-                  onClick={() => { 
+                  onClick={() => {
                     let newData: any[] = [];
                     checkDataArray.map((x) => {
                       if (x.id == row.id) {
@@ -1197,37 +1196,37 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                         else x.lock = "N";
                       }
                       newData.push(x)
-                    }) 
+                    })
                     setCheckDataArray(newData)
                   }}
                   sx={{width:80}}
-                  > 
+                  >
                     {(checkDataArray.filter((x:any)=> x.id == row.id).length==0? false :checkDataArray.filter((x:any)=> x.id == row.id)[0].lock == 'N') ? (
                       <Image src={LockOff} alt={"SavingsImg"} width="25" />
                     ): (
                       <Image src={LockOn} alt={"SavingsImg"} width="25" />
                     )}
                   </TableCell>}
-                    
-                  <TableCell 
+
+                  <TableCell
                   style={{ textAlign: 'center', cursor: 'pointer'}}
                   onClick={() => {
                     setExpandedRow(expandedRow === rowIndex ? null : rowIndex);
                   }}
                   sx={{width:80}}
-                  > 
+                  >
                     {expandedRow === rowIndex ? (
                       <Image src={DetailOff} alt={"SavingsImg"} width="25" />
                     ): (
                       <Image src={DetailOn} alt={"SavingsImg"} width="25" />
                     )}
                   </TableCell>
-                  
+
                 </TableRow>
 
               ))}
             </TableBody>
-           
+
         </TableContainer> : <Typography>자가점검중</Typography>
       }
       <Dialog open={showModal} onClose={onClose}>
@@ -1238,11 +1237,11 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
         <DialogActions>
           <Button onClick={() => { onClose(); }}>OK</Button>
         </DialogActions>
-      </Dialog> 
+      </Dialog>
 
       <Dialog  open={detailsDialogOpen} onClose={() => setDetailsDialogOpen(false)} maxWidth="sm" fullWidth>
               <DialogTitle  sx={{ textAlign: 'center',   }} >이슈 사유</DialogTitle>
-              <DialogContent> 
+              <DialogContent>
               <Grid container spacing={2}>
                 {/* 그리드 컨테이너를 사용하여 2행 2열의 그리드를 생성 */}
                 {checkboxesData.map((checkbox, index) => (
@@ -1258,7 +1257,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                     </Typography>
                   </Grid>
                 ))}
-              </Grid> 
+              </Grid>
                 <TextField
                   label="메모 작성"
                   variant="outlined"
@@ -1273,7 +1272,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
                       </IconButton>
                     )
                   }}
-                />   
+                />
 
               </DialogContent>
               <DialogActions>
@@ -1281,7 +1280,7 @@ const CheckResult = ({consignor,  userType , consigneeData}:  { consignor: strin
               </DialogActions>
             </Dialog>
     </Box>
-      
+
   );
 };
 

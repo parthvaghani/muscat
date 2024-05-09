@@ -1,5 +1,5 @@
 import { Grid, InputAdornment, Button, MenuItem, Divider, Typography, RadioGroup, FormControlLabel, Tabs, Tab, Autocomplete,  TextField, Dialog, DialogActions, DialogContent, DialogContentText,  DialogTitle } from '@mui/material';
-import { useRouter } from 'next/router'; 
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import CustomFormLabel from '@src/components/forms/theme-elements/CustomFormLabel';
 import CustomTextField from '@src/components/forms/theme-elements/CustomTextField';
@@ -13,7 +13,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { Select,  InputLabel, FormControl, Chip,  Box } from '@mui/material';
 import { API_URL } from '@pages/constant';
 import axiosPost from '@pages/axiosWrapper';
-import { API_URL } from '@pages/constant';
 
 interface PrivacyItem {
   id: number;
@@ -58,7 +57,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
       if (response.status === 200) {
         let len = response.data.length
         let newItems = []
-        
+
         let items = response.data
         for (let i = 0; i < len;) {
           let row_data = [];
@@ -74,7 +73,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
         }
 
         console.log(newItems)
-        setPrivacyItems(newItems); 
+        setPrivacyItems(newItems);
       } else {
         console.error('Failed to fetch items');
       }
@@ -143,7 +142,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
   const onItemClick = (id: any, name: any) => {
     if (selectedItems.findIndex((x) => x.id == id) == -1)
     {
-      setSelectedItems([...selectedItems, {id: id, name: name}]);  
+      setSelectedItems([...selectedItems, {id: id, name: name}]);
     }
     else {
       setSelectedItems((items) => items.filter((item) => item.id !== id));
@@ -217,7 +216,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
       let dd = response.data.data;
       let ii = response.data.id;
       if (response.data.result == 'SUCCESS') {
-        
+
         sessionStorage.setItem('consignee_status', '')
         setModalMsg1('정확히 저장되었습니다.')
         setShowModal1(true)
@@ -341,7 +340,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
         <Grid item xs={3} sm={5}>
           <CustomTextField
             type="date"
-            id="fs-date" 
+            id="fs-date"
             sx={{width:200}}
             value={contractEndDate}
             onChange={(e:any) => setContractEndDate(e.target.value)}
@@ -373,7 +372,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
             onChange={(e:any) => setTotalEmployees(e.target.value)}
             startAdornment={<InputAdornment position="start">총</InputAdornment>}
             endAdornment={<InputAdornment position="end">명</InputAdornment>}
-            inputProps={{ style: { textAlign: 'end' } }} 
+            inputProps={{ style: { textAlign: 'end' } }}
           />
         </Grid>
         <Grid item xs={12} sm={3} display="flex" alignItems="center">
@@ -388,7 +387,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
             value={privacyHandlers}
             onChange={(e:any) => setPrivacyHandlers(e.target.value)}
             endAdornment={<InputAdornment position="end">명</InputAdornment>}
-            inputProps={{ style: { textAlign: 'end' } }} 
+            inputProps={{ style: { textAlign: 'end' } }}
           />
         </Grid>
         <Grid item xs={12} sm={3} display="flex" alignItems="start">
@@ -412,7 +411,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
             onChange={(e:any) => setYearlyPrivacyHandle(e.target.value)}
             startAdornment={<InputAdornment position="start">연간</InputAdornment>}
             endAdornment={<InputAdornment position="end">명</InputAdornment>}
-            inputProps={{ style: { textAlign: 'end' } }} 
+            inputProps={{ style: { textAlign: 'end' } }}
           />
         </Grid>
         <Grid item xs={12} sm={3} display="flex" alignItems="start">
@@ -424,7 +423,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
           <Button size={"small"} sx={{width: 40, height: 45, p:0, alignItems: 'center', justifyContent: 'center'}} onClick={onAdd}>
             <AddIcon/>
           </Button>
-          
+
           <Box mt={1}>
             {selectedItems.map((item, index) => (
               <Chip
@@ -433,7 +432,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
                 label={item.name}
                 onDelete={handleDelete(item)}
               />
-            ))} 
+            ))}
           </Box>
         </Grid>
         <Grid item xs={12} sm={3} display="flex" alignItems="center">
@@ -463,7 +462,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
           {retrustStatus === 'yes' && (
             <CustomTextField id="bl-re" sx={{width:600}} placeholder="재위탁사 명(위탁업무)"  value={retrustStatusText} onChange={(e:any) => setRetrustStatusText(e.target.value)}/>
           )}
-          
+
         </Grid>
         <Grid item xs={12} sm={3} display="flex" alignItems="center">
           <CustomFormLabel htmlFor="bl-thid" sx={{ mt: 0, mb: { xs: '-10px', sm: 0 } }}>
@@ -523,7 +522,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
                         </Typography>
                       )
                     })}
-                    
+
                   </Grid>
                 </Grid>
               );
@@ -533,7 +532,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
         <DialogActions>
           <Button onClick={() => { onClose(); }}>OK</Button>
         </DialogActions>
-      </Dialog> 
+      </Dialog>
 
       <Dialog open={showModal1} onClose={onClose1}>
           <DialogTitle></DialogTitle>
@@ -543,7 +542,7 @@ const StatusLayout = ({project, setNoStatus}: Props) => {
           <DialogActions>
             <Button onClick={() => { onClose1(); }}>OK</Button>
           </DialogActions>
-        </Dialog> 
+        </Dialog>
     </div>
   );
 };
